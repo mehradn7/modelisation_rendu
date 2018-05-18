@@ -29,7 +29,6 @@ load dino_Ps;
 % A COMPLETER quand vous aurez termine la premiere partie permettant de
 % binariser les images
 % ... 
-kmeans
 % Affichage des images
 figure; 
 subplot(2,2,1); imshow(im(:,:,:,1)); title('Image 1');
