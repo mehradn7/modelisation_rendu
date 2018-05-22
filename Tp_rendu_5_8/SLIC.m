@@ -22,7 +22,7 @@ im1 = imread('images/viff.001.ppm');
 
 % Placement des germes
 N = nb_lignes*nb_colonnes;
-K = 100;
+K = 200;
 S = floor(sqrt(N/K));
 
 [X,Y] = meshgrid(floor(S/2):S:nb_lignes,floor(S/2):S:nb_colonnes);
@@ -44,10 +44,15 @@ C(:,3) = im1_b_grille(:);
 C(:,4) = X(:);
 C(:,5) = Y(:);
 
-figure; 
-hold on
-imshow(im1); title('Image 1');
-plot(C(:,4),C(:,5),'+ r');
+% Affichage de l'image et des germes
+figure(1); 
+title('Image 1');
+
+imshow(im1);
+hold on 
+plot(C(:,5),C(:,4),'+ r');
+hold off
+drawnow nocallbacks
 
 
 
@@ -57,17 +62,20 @@ n=3;
 
 % calcul des superpixels par k-moyenne
 m=10;
-seuil = 10;
+seuil = 5;
 cond = true;
 P = [im1_l(:), im1_a(:), im1_b(:)];
-
+nb_it=0;
 while cond
     newC = zeros(size(C));
+    super_pixels = zeros(length(P),1);
     for k=1:length(P)
+        
         [x_p,y_p] = ind2sub(size(im1_l),k);
-        ind_voisin_x = find(abs(C(:,4)-x_p)<=S);
-        ind_voisin_y = find(abs(C(:,5)-y_p)<=S);
-        ind_voisin = intersect(ind_voisin_x, ind_voisin_y);
+        
+        ind_voisin = find(sqrt((C(:,4)-x_p).^2 + (C(:,5)-y_p).^2)<=2*S);
+        
+        
         C_voisin = C(ind_voisin,:);
         
         D = dist_SLIC(C_voisin,[P(k,:) ,x_p, y_p],m,S);
@@ -75,21 +83,29 @@ while cond
         [min_D, i_min_D] = min(D);
         i_newC_p = ind_voisin(i_min_D);
         
-        if all(newC(i_newC_p,:)==0)
-            newC(i_newC_p,:) = [P(k,:) ,x_p, y_p];
+        super_pixels(k) = i_newC_p;  
         
-        else
-            newC(i_newC_p,:) = mean([P(k,:) ,x_p, y_p ; newC(i_newC_p,:)],1);
-        
-        end   
+    end
+    for k_C=1:size(C,1)
+        ind_P = find(super_pixels == k_C);
+        [x_p,y_p] = ind2sub(size(im1_l),ind_P);
+        newC(k_C,:) = mean([P(ind_P,:), x_p, y_p]);
     end
     
-    E = mean(sqrt(sum((C-newC).^2,2)))
+    
+    E = mean(sqrt(sum((C-newC).^2,2)));
     C = newC;
+    imshow(im1);
+    hold on
+    plot(C(:,5),C(:,4),'+ r');
+    hold off
+    
     cond = E>seuil;
+    drawnow nocallbacks
+    nb_it=nb_it+1;
 end
 
-
+save SLIC;
 
 
 

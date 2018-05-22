@@ -28,7 +28,7 @@ load dino_Ps;
 % de taille nb_lignes x nb_colonnes x nb_images
 % A COMPLETER quand vous aurez termine la premiere partie permettant de
 % binariser les images
-% ... 
+load mask;
 % Affichage des images
 figure; 
 subplot(2,2,1); imshow(im(:,:,:,1)); title('Image 1');
@@ -37,16 +37,17 @@ subplot(2,2,3); imshow(im(:,:,:,17)); title('Image 17');
 subplot(2,2,4); imshow(im(:,:,:,25)); title('Image 25');
 
 % Affichage des masques associes
-% figure;
-% subplot(2,2,1); ... ; title('Masque image 1');
-% subplot(2,2,2); ... ; title('Masque image 9');
-% subplot(2,2,3); ... ; title('Masque image 17');
-% subplot(2,2,4); ... ; title('Masque image 25');
+figure;
+subplot(2,2,1); imshow(im_mask(:,:,1)); title('Masque image 1');
+subplot(2,2,2); imshow(im_mask(:,:,9)); title('Masque image 9');
+subplot(2,2,3); imshow(im_mask(:,:,17)); title('Masque image 17');
+subplot(2,2,4); imshow(im_mask(:,:,25)); title('Masque image 25');
+
 
 % Reconstruction des points 3D
 X = []; % Contient les coordonnees des points en 3D
 color = []; % Contient la couleur associee
-% Pour chaque coupple de points apparies
+% Pour chaque couple de points apparies
 for i = 1:size(pts,1)
     % Recuperation des ensembles de points apparies
     l = find(pts(i,1:2:end)~=-1);
