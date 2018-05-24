@@ -17,26 +17,14 @@ if (im_mask_1(i,j) == 1)
 end
 
 B = bwtraceboundary(im_mask_1, P_initial, 'NW');
-imshow(im_mask_1)
-hold on
-[VX_init, VY_init] = voronoi(B(:,2), B(:,1));
-VX = VX_init(1,:);
-VY = VY_init(1,:);
-ind_x = VX >= 1;
-VX = VX(ind_x);
-VY = VY(ind_x);
-ind_x = VX <= nb_colonnes - 50;
-VX = VX(ind_x);
-VY = VY(ind_x);
-ind_y = VY >= 5;
-VX = VX(ind_y);
-VY = VY(ind_y);
-ind_y = VY <= nb_lignes;
-VX = VX(ind_y);
-VY = VY(ind_y);
 
-Px = round(VX);
-Py = round(VY);
+[VX_init, VY_init] = voronoi(B(1:10:end,2), B(1:10:end,1));
+
+[ VX1,VX2,VY1,VY2] = clean_voronoi( VX_init, VY_init, nb_lignes, nb_colonnes );
+
+
+Px = round(VX1);
+Py = round(VY1);
 ind_int = [];
 for k=1:length(Px)
     if im_mask_1(Py(k),Px(k)) == 1
@@ -44,26 +32,40 @@ for k=1:length(Px)
     end
 end
 
-VX = VX(ind_int);
-VY = VY(ind_int);
-rayons = zeros(length(VX), 1);
+VX1 = VX1(ind_int);
+VY1 = VY1(ind_int);
+VX2 = VX2(ind_int);
+VY2 = VY2(ind_int);
+rayons = zeros(length(VX1), 1);
 
-for k=1:length(VX)
-    distances_frontiere = sqrt((VX(k) - B(:,2)).^2 + (VY(k) - B(:,1)).^2);
+for k=1:length(VX1)
+    distances_frontiere = sqrt((VX1(k) - B(:,2)).^2 + (VY1(k) - B(:,1)).^2);
     [rayon, ~] = min(distances_frontiere);
     rayons(k) = rayon;
 end
 
-rayon_min_souhaite = 5;
-indices_rayons_a_garder = find(rayons > rayon_min_souhaite);
-VX = VX(indices_rayons_a_garder);
-VY = VY(indices_rayons_a_garder);
-rayons = rayons(indices_rayons_a_garder);
+% rayon_min_souhaite = 10;
+% indices_rayons_a_garder = find(rayons > rayon_min_souhaite);
+% VX1 = VX1(indices_rayons_a_garder);
+% VX2 = VX2(indices_rayons_a_garder);
+% VY1 = VY1(indices_rayons_a_garder);
+% VY2 = VY2(indices_rayons_a_garder);
+% rayons = rayons(indices_rayons_a_garder);
 
 
-TRI = delaunay(B(:,2), B(:,1));
+VX = [VX1; VX2];
+VY = [VY1; VY2];
 
-
-plot(VX, VY, '*b')
+figure(1);
+imshow(im_mask_1)
+hold on
+plot(VX, VY, 'b')
 plot(B(:,2), B(:,1), 'g');
+hold off;
+
+figure(2);
+imshow(im_mask_1)
+hold on
+viscircles([VX(1,:)'  VY(1,:)'],rayons,'LineWidth',0.01);
+
 

@@ -55,14 +55,34 @@ hold off
 drawnow nocallbacks
 
 
-
 % Affinement de la grille
 
-n=3;
+n=1;
+im_gradient_L = imgradient(im1_l);
+for k=1:size(C,1)
+   im_gradient_k = im_gradient_L(C(k,4)-n:C(k,4)+n,C(k,5)-n:C(k,5)+n);
+   [~, i_min] = min(im_gradient_k(:));
+   [x_min,y_min] = ind2sub(size(im_gradient_L), i_min);
+   C(k,1) = im1_l(x_min,y_min);
+   C(k,2) = im1_a(x_min,y_min);
+   C(k,3) = im1_b(x_min,y_min);
+   C(k,4) = C(k,4) + x_min -n-1;
+   C(k,5) = C(k,5) + y_min -n-1;    
+end
+
+% Affichage de l'image et des germes affinées
+figure(1); 
+title('Image 1');
+
+imshow(im1);
+hold on 
+plot(C(:,5),C(:,4),'+ r');
+hold off
+drawnow nocallbacks
 
 % calcul des superpixels par k-moyenne
 m=10;
-seuil = 5;
+seuil = 20;
 cond = true;
 P = [im1_l(:), im1_a(:), im1_b(:)];
 nb_it=0;
@@ -93,7 +113,7 @@ while cond
     end
     
     
-    E = mean(sqrt(sum((C-newC).^2,2)));
+    E = sum(sqrt(sum((C-newC).^2,2)));
     C = newC;
     imshow(im1);
     hold on
