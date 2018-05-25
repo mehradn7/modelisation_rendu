@@ -60,14 +60,16 @@ drawnow nocallbacks
 n=1;
 im_gradient_L = imgradient(im1_l);
 for k=1:size(C,1)
-   im_gradient_k = im_gradient_L(C(k,4)-n:C(k,4)+n,C(k,5)-n:C(k,5)+n);
+   im_gradient_k = im_gradient_L(max(C(k,4)-n,1):min(C(k,4)+n,nb_lignes),max(C(k,5)-n,1):min(C(k,5)+n,nb_colonnes));
    [~, i_min] = min(im_gradient_k(:));
-   [x_min,y_min] = ind2sub(size(im_gradient_L), i_min);
-   C(k,1) = im1_l(x_min,y_min);
-   C(k,2) = im1_a(x_min,y_min);
-   C(k,3) = im1_b(x_min,y_min);
-   C(k,4) = C(k,4) + x_min -n-1;
-   C(k,5) = C(k,5) + y_min -n-1;    
+   [x_min,y_min] = ind2sub(size(im_gradient_k), i_min);
+   new_x = C(k,4) + x_min -n-1;
+   new_y = C(k,5) + y_min -n-1;
+   C(k,1) = im1_l(round(new_x),round(new_y));
+   C(k,2) = im1_a(round(new_x),round(new_y));
+   C(k,3) = im1_b(round(new_x),round(new_y));
+   C(k,4) = new_x;
+   C(k,5) = new_y;    
 end
 
 % Affichage de l'image et des germes affinées
@@ -94,8 +96,6 @@ while cond
         [x_p,y_p] = ind2sub(size(im1_l),k);
         
         ind_voisin = find(sqrt((C(:,4)-x_p).^2 + (C(:,5)-y_p).^2)<=2*S);
-        
-        
         C_voisin = C(ind_voisin,:);
         
         D = dist_SLIC(C_voisin,[P(k,:) ,x_p, y_p],m,S);

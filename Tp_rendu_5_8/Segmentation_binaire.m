@@ -1,8 +1,8 @@
 % Segmentation binaire
 load SLIC;
-seuil_L = 57;
-seuil_a = 18.9;
-seuil_b = 0;
+seuil_L = 56.9;
+seuil_a = 19.3;
+seuil_b = -17;
 ind_seuil_C_L = find(C(:,1) > seuil_L);
 ind_seuil_C_a = find(C(:,2) > seuil_a);
 ind_seuil_C_b = find(C(:,3) > seuil_b);
