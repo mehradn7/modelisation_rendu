@@ -84,7 +84,7 @@ drawnow nocallbacks
 
 % calcul des superpixels par k-moyenne
 m=10;
-seuil = 20;
+seuil = 10;
 cond = true;
 P = [im1_l(:), im1_a(:), im1_b(:)];
 nb_it=0;
@@ -125,7 +125,7 @@ while cond
     nb_it=nb_it+1;
 end
 
-save SLIC;
+save('SLIC','C','super_pixels','im1');
 
 
 
